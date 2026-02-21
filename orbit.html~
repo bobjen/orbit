@@ -1,0 +1,186 @@
+<html>
+<head>
+  <title>a javascript applet orbit simulator</title>
+  <script src="../js/orbit.js"></script>
+  <meta name="keywords" content="orbit, nbody, gravity, gravitation, javascript, multistep, simulation, space">
+</head>
+
+<body bgcolor="#000000"
+text="#ffffff" link="#ffff00" vlink="#00ffff" alink="#0fffff">
+
+<center><h2>Javascript Canvas for Gravitational Orbit Simulation</h2></center>
+
+<p><center>Click to start, stop, rotate or zoom<br>
+  <canvas id="unstable" style="border:1px solid #ffffff;">
+    <script>
+      document.getElementById("unstable").width = window.innerWidth*0.9;
+      document.getElementById("unstable").height = window.innerWidth*0.6;
+      orbit({
+      name:"unstable",
+      increment:0.0015,
+      background:"#000000",
+      points:8,
+      dejitter:true,
+      trail:true,
+      work:10,
+      eye:new Eye(5.0, new Point(0.0, 0.0, 0.0), 500.0),
+      moons:[
+      new Moon("moon1", new Point(6.0, 0.0, 6.0), new Point(0.0, 0.0, -6.0), 200.0, "#ffff00", 0.02),
+      new Moon("moon2", new Point(10.0, 0.0, 0.0), new Point(0.0, 0.0, 0.0), 200.0, "#00ffff", 0.02),
+      new Moon("moon3", new Point(0.0, 7.0, 0.0), new Point(0.0, -7.0, 0.0), 200.0, "#ffffff", 0.02),
+      new Moon("moon4", new Point(7.0, 0.0, 0.0), new Point(0.0, 0.0, -7.0), 200.0, "#ff00ff", 0.02)
+      ]})
+    </script>
+  </canvas>
+</center>
+
+<p><hr size=1>
+<p>The canvas above is a gravitational simulator of orbits in space.
+The code is in
+<a href="orbit.js">orbit.js</a>.  The mouse lets it stop and start
+(by clicking without dragging), roll left or up (by clicking near the
+center and dragging), clockwise and zoom (by clicking far from the
+center and dragging).  Moon colors, sizes, masses, positions, and
+velocities are javascript parameters.  Total momentum and and the center
+of gravity are automatically normalized to (0,0,0).  Trajectories are
+plotted with a <a href="../math/multistep.html">symmetric multistep
+method</a>.
+
+<p>Here's a page that <a href="../physics/orbit101.html">puts the
+javascript through its paces</a>, and another of <a
+href="../physics/kempler.html">neat orbits</a>, and
+  my <a href="../physics/index.html">full collection of orbit
+    simulations</a>.
+
+<p>Parameters for the javascript are:
+<dl>
+<dt>name:"myfancyorbits"
+<dd>A name for this simulation.  You can have multiple simulations per .html page, with a canvas for each. The canvas id="myfancyorbits" matches this name.
+
+<dt>increment:0.2
+<dd>The value is how big a step to take each time the display is refreshed.  There are at most 20 refreshes per second with sleep:50.  Bigger values mean faster orbits and bigger errors.
+
+<dt>background:"#000000"
+<dd>The color of the background.
+
+<dt>work:5
+<dd>The number of steps to do per increment. For small number of objects, steps are cheaper than the once-per-increment displays. Errors are actually based on step size, not increment size. So increasing steps without increasing increment increases accuracy, and increases CPU usage. You need at least one step per increment.
+
+<dt>framerate:50
+<dd>The number of milliseconds to wait after each display.  This lets
+Javascript garbage collect, and allows the simulation to avoid eating all your
+CPU.  It does NOT give you accurate speed control.
+
+<dt>trail:true
+<dd>An optional parameter.  Have all the moons leave trails.  Zooming
+or rotating erases the trails.
+
+<dt>fade:3
+<dd>An optional parameter.  How fast do trails fade. Smaller is faster. Default is 0.
+  
+<dt>eye:new Eye(100.0, new Point(0.0,-0.3,0.0), 300.0)"
+<dd>Distance from center. (left-rotation, up-rotation, clockwise-rotation). Zoom.  Rotations are specified in radians, and are applied in the order left, up, clockwise.
+
+<dt>stop:true
+<dd>An optional parameter.  Bring up the javascript with nothing
+happening.  Clicking on the canvas (without dragging the mouse) will
+start the action.  To turn off, don't do value="no", just don't use
+this parameter.
+
+<dt>lifetime:0.0
+<dd>An optional parameter. The virtual length of time to run the
+simulation.  If there are 20 increments per second (due to framerate being 50 milliseconds) and lifetime=10 and interval=0.01, the simulation will run for 10/(0.01*20) = 50 seconds. The simulation stops once it hits its limit, then clicking on it will reinitialize the simulation and run it again. Default is 0, meaning it runs forever.
+
+<dt>scalemass:1.0
+<dd>An optional parameter.  Scale all masses by this amount.  I added
+it so that I could find the gravitational constant experimentally for
+my solar system simulation. Default is 1.0.
+
+<dt>moons: new Moon("moon1", new Point(6.0, 0.0, 6.0), new Point(0.0, 0.0, -6.0), 200.0, "#ffff00", 0.02)
+<dd>Moon 1 is defined to have: position(x,y,z), velocity(x,y,z), mass,
+  color, size.
+  
+<dt>follow:17
+<dd>An optional parameter.  Keep the center on moon17.  The default
+center is the center of gravity.
+
+<dt>noperspective:true
+<dd>An optional parameter.  No perspective, treat all distances as the distance from the eye to the origin. Default is false.
+
+<dt>autocenter:true
+<dd>An optional parameter. Rotate the simulation around the center of mass. Default is true.
+
+<dt>points:8
+<dd>An optional parameter. Default is 8. Number of points to use in the multistep method.  A 9th order method uses 8 points. More points is theoretically more accurate, but also requires more steps per orbit to be stable ... things rapidly fall apart if steps are too big, but for two methods where the stepsize is small enough for both to be stable, the one with more points will have more accuracy.
+
+<dt>dejitter:true
+<dd>An optional parameter. The errors introduced by the simulation show up as jitter in the orbit. This smooths them out, at the cost of making the simulation not time-reversible, which makes the orbits not quite obey conservation of energy. Dejitter is good for fast demonstrations but bad for long term simulations. Default is false.
+    
+</dl>
+
+<hr line=1>
+
+<p>Here's an overview of the orbital code.
+
+<p>Newton's Law of Gravity lets you deduce accelerations from
+positions and masses of moons (Simulate.accel()).  The accelerations,
+positions, and velocities (Moon.velocity()) let you approximate the
+positions after a small time increment from the current time
+(Moon.step()).  It's convenient to take several steps per display
+(Simulate.move()).
+
+<p>I use an <a href="../math/multistep.html">explicit symmetric
+multistep method</a> for finding the next positions (Moon.step()).
+This has several odd consequences:
+<ul>
+<li>The next position depends on the previous Moon.POINTS positions,
+not just the previous position.  (That implies Moon.POINTS positions
+must be found by some other method before the multistep method can be
+used.  See Simulate.getGoing(), described below.)
+<li>Each of those Moon.POINTS positions has accumulated a different
+error.  Every Moon.POINTS position has about the same error.  When
+these errors get big, the moons appear to jitter in their orbits.  I
+call this problem <i>jitter</i>.  The program dynamically detects and
+dejitterizes jittery orbits (Simulate.dejitter(), Moon.dejitter()).
+<li>Velocities aren't computed or stored.  Multistep methods use
+differences in previous positions instead of velocities.  Thus
+Moon.velocity() for estimating the velocity from positions when we
+need it.
+</ul>
+
+<P>Moons of weight 0 have an optimization that they're ignored when
+calculating the forces on all other objects.  That means 1 sun with
+1000 massless satellites takes O(n) to simulate instead of
+O(n<sup>2</sup>).  It allows massless objects around binary stars or
+in globular clusters, too.
+
+<p>Since the multistep method needs Moon.degree previous positions,
+Simulate.getGoing() uses a different method to find the first few
+positions.  First it uses the Verlet leapfrog method to make
+Moon.POINTS steps 2<sup>-32</sup>th the final size.  Next it fills
+Moon.history steps using the multistep method.  Then it takes every
+other position, doubles the stepsize, and generates Moon.history more
+positions.  This is repeated 32 times, bringing the time increment up
+to the intended size.
+
+<p>Total energy is supposed to be conserved.  Any gain or loss of
+energy corresponds to errors in the integration
+(Simulate.FindEnergy()).  Total energy is kinetic+potential.
+Potential energy is -mass/||distance||.  That is always larger than
+kinetic (mass*velocity<sup>2</sup>/2) unless some objects have escape
+velocity.  Although Simulate.FindEnergy() could use the distances
+between moons calculated in Simulate.accel(), accel() is called much
+more often, so it turned out to be faster to have accel() simple and
+FindEnergy() as a separate routine.
+
+<hr line=1>
+
+<p><a href="../scifi/itzu.html">Itzu, or Crabs In Space</a>
+<br><a href="../physics/index.html">index of all orbit simulations</a>.
+<br><a href="../physics/whythere.html">Why there are no perpetual
+motion machines</a>
+<br><a href="../crypto/protocol.html">Cryptographic Protocols</a>
+<br><a href="../index.html">Table of Contents</a>
+
+</body>
+</html>
