@@ -43,87 +43,72 @@ The code is in
 center and dragging), clockwise and zoom (by clicking far from the
 center and dragging).  Moon colors, sizes, masses, positions, and
 velocities are javascript parameters.  Total momentum and and the center
-of gravity are automatically normalized to (0,0,0).  Trajectories are
-plotted with a <a href="/web/20210510174438/https://burtleburtle.net/math/multistep.html">symmetric multistep
-method</a>.
-
-<p>Here's a page that <a href="/web/20210510174438/https://burtleburtle.net/physics/orbit101.html">puts the
-javascript through its paces</a>, and another of <a href="/web/20210510174438/https://burtleburtle.net/physics/kempler.html">neat orbits</a>.
+of gravity are automatically normalized to (0,0,0).
 
 <p>Parameters for the javascript are:
 <dl>
-<dt>name="increment" value="0.2"
-<dd>The value is how big a step to take each refresh.  There are 20
-refreshes per second.  Bigger values mean faster orbits and bigger
-errors.
+<dt>name:"myfancyorbits"
+<dd>A name for this simulation.  You can have multiple simulations per .html page, with a canvas for each. The canvas id="myfancyorbits" matches this name.
 
-<dt>name="background" value="000000"
+<dt>increment:0.2
+<dd>The value is how big a step to take each time the display is refreshed.  There are at most 20 refreshes per second with sleep:50.  Bigger values mean faster orbits and bigger errors.
+
+<dt>background:"#000000"
 <dd>The color of the background.
 
-<dt>name="work" value="5"
-<dd>The number of steps to do per increment.  Increases accuracy,
-increases CPU usage.
+<dt>work:5
+<dd>The number of steps to do per increment. For small number of objects, steps are cheaper than the once-per-increment displays. Errors are actually based on step size, not increment size. So increasing steps without increasing increment increases accuracy, and increases CPU usage. You need at least one step per increment.
 
-<dt>name="sleep" value="50"
+<dt>framerate:50
 <dd>The number of milliseconds to wait after each display.  This lets
 Javascript garbage collect, and allows the simulation to avoid eating all your
 CPU.  It does NOT give you accurate speed control.
 
-<dt>name="trail" value="yes"
+<dt>trail:true
 <dd>An optional parameter.  Have all the moons leave trails.  Zooming
 or rotating erases the trails.
 
-<dt>name="energy" value="yes"
-<dd>An optional parameter.  Report (current-initial)/initial total
-energy and the number of times positions have been displayed.
-Calculating energy requires velocity, and my integration formulas
-don't track velocity, so I approximate it from the positions.  For
-stable simulations (like the solar system), the error in approximating
-velocity overwhelms any real error in energy conservation.  For
-unstable simulations (like the one above), close passes cause real
-errors in energy, position, you name it.
+<dt>fade:3
+<dd>An optional parameter.  How fast do trails fade. Smaller is faster. Default is 0.
+  
+<dt>eye:new Eye(100.0, new Point(0.0,-0.3,0.0), 300.0)"
+<dd>Distance from center. (left-rotation, up-rotation, clockwise-rotation). Zoom.  Rotations are specified in radians, and are applied in the order left, up, clockwise.
 
-<dt>name="eye" value="100.0  0.0  -0.3  0.0  300.0"
-<dd>Distance from center, left-rotation, up-rotation,
-clockwise-rotation, zoom.  Rotations are specified in radians, and are
-applied in the order left, up, clockwise.
-
-<dt>name="stop" value="yes"
+<dt>stop:true
 <dd>An optional parameter.  Bring up the javascript with nothing
 happening.  Clicking on the canvas (without dragging the mouse) will
 start the action.  To turn off, don't do value="no", just don't use
 this parameter.
 
-<dt>name="length" value="10.0"
-<dd>An optional parameter.  The virtual length of time to run the
-simulation.  There are 20 steps per second, if length=10 and
-interval=0.01 the simulation will run for 10/(0.01*20) = 50 seconds.
-The simulation stops once it hits its limit, then clicking on it will
-reinitialize the simulation and run it again.
+<dt>lifetime:0.0
+<dd>An optional parameter. The virtual length of time to run the
+simulation.  If there are 20 increments per second (due to framerate being 50 milliseconds) and lifetime=10 and interval=0.01, the simulation will run for 10/(0.01*20) = 50 seconds. The simulation stops once it hits its limit, then clicking on it will reinitialize the simulation and run it again. Default is 0, meaning it runs forever.
 
-<dt>name="scalemass" value="1.0"
+<dt>scalemass:1.0
 <dd>An optional parameter.  Scale all masses by this amount.  I added
 it so that I could find the gravitational constant experimentally for
-my solar system simulation.
+my solar system simulation. Default is 1.0.
 
-<dt>new Moon("moon1", new Point(6.0, 0.0, 6.0), new Point(0.0, 0.0, -6.0), 200.0, "#ffff00", 0.02)
+<dt>moons: new Moon("moon1", new Point(6.0, 0.0, 6.0), new Point(0.0, 0.0, -6.0), 200.0, "#ffff00", 0.02)
 <dd>Moon 1 is defined to have: position(x,y,z), velocity(x,y,z), mass,
-color, size.
-
-<p>Moons of weight 0 have an optimization that they're ignored when
-calculating the forces on all other objects.  That means 1 sun with
-1000 massless satellites takes O(n) to simulate instead of
-O(n<sup>2</sup>).  It allows massless objects around binary stars or
-in globular clusters, too.
-
-<dt>name="follow" value="17"
+  color, size.
+  
+<dt>follow:17
 <dd>An optional parameter.  Keep the center on moon17.  The default
 center is the center of gravity.
 
-<dt>name="noperspective" value="yes"
-<dd>An optional parameter.  No perspective, treat all distances as
-the distance from the eye to the origin.
+<dt>noperspective:true
+<dd>An optional parameter.  No perspective, treat all distances as the distance from the eye to the origin. Default is false.
 
+<dt>autocenter:true
+<dd>An optional parameter. Rotate the simulation around the center of mass. Default is true.
+
+<dt>points:8
+<dd>An optional parameter. Default is 8. Number of points to use in the multistep method.  A 9th order method uses 8 points. More points is theoretically more accurate, but also requires more steps per orbit to be stable ... things rapidly fall apart if steps are too big, but for two methods where the stepsize is small enough for both to be stable, the one with more points will have more accuracy.
+
+<dt>dejitter:true
+<dd>An optional parameter. The errors introduced by the simulation show up as jitter in the orbit. This smooths them out, at the cost of making the simulation not time-reversible, which makes the orbits not quite obey conservation of energy. Dejitter is good for fast demonstrations but bad for long term simulations. Default is false.
+    
 </dl>
 
 <hr line="1">
@@ -137,8 +122,7 @@ positions after a small time increment from the current time
 (Moon.step()).  It's convenient to take several steps per display
 (Simulate.move()).
 
-<p>I use an <a href="/web/20210510174438/https://burtleburtle.net/math/multistep.html">explicit symmetric
-multistep method</a> for finding the next positions (Moon.step()).
+<p>I use an explicit symmetric multistep method for finding the next positions (Moon.step()).
 This has several odd consequences:
 <ul>
 <li>The next position depends on the previous Moon.POINTS positions,
@@ -155,6 +139,12 @@ differences in previous positions instead of velocities.  Thus
 Moon.velocity() for estimating the velocity from positions when we
 need it.
 </ul>
+
+<p>Moons of weight 0 have an optimization that they're ignored when
+calculating the forces on all other objects.  That means 1 sun with
+1000 massless satellites takes O(n) to simulate instead of
+O(n<sup>2</sup>).  It allows massless objects around binary stars or
+in globular clusters, too.
 
 <p>Since the multistep method needs Moon.degree previous positions,
 Simulate.getGoing() uses a different method to find the first few
@@ -174,6 +164,6 @@ velocity.  Although Simulate.FindEnergy() could use the distances
 between moons calculated in Simulate.accel(), accel() is called much
 more often, so it turned out to be faster to have accel() simple and
 FindEnergy() as a separate routine.
-
+  
 </body>
 </html>
