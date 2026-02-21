@@ -12,59 +12,47 @@ function orbit(obj)
     canvas.addEventListener("mouseup", stopDrag, false);
     var id = setInterval(move, canvas.cosmos.framerate);
 
-    function start()
-    {
+    function start() {
         canvas.cosmos = new Cosmos(obj, canvas);
         canvas.cosmos.prepare();
         canvas.cosmos.display();
     }
 
-    function move()
-    {
-        if (!canvas.stopped)
-        {
-            if (canvas.restart)
-            {
+    function move() {
+        if (!canvas.stopped) {
+            if (canvas.restart) {
                 start();
                 canvas.stopped = false;
-            }
-            else
-            {
+            } else {
                 canvas.cosmos.move();
                 canvas.cosmos.display();
             }
         }
     }
 
-    function captureMouseEvent(ev)
-    {
+    function captureMouseEvent(ev) {
         canvas.newMouseX = ev.clientX - canvas.cosmos.eye.centerX;
         canvas.newMouseY = ev.clientY - canvas.cosmos.eye.centerY;
         canvas.shiftKey = ev.shiftKey;
     }
     
-    function startDrag(ev)
-    {
+    function startDrag(ev) {
         captureMouseEvent(ev);
         canvas.mouseDown = true;
         canvas.oldMouseX = canvas.newMouseX;
         canvas.oldMouseY = canvas.newMouseY;
     }
 
-    function drag(ev)
-    {
-        if (canvas.mouseDown)
-        {
+    function drag(ev) {
+        if (canvas.mouseDown) {
             captureMouseEvent(ev);
-            if (canvas.oldMouseX != canvas.newMouseX || canvas.oldMouseY != canvas.newMouseY)
-            {
+            if (canvas.oldMouseX != canvas.newMouseX || canvas.oldMouseY != canvas.newMouseY) {
                 canvas.mouseDrag = true;
             }
         }
     }
 
-    function stopDrag(ev)
-    {
+    function stopDrag(ev) {
         captureMouseEvent(ev);
         canvas.mouseDown = false;
         if (!canvas.mouseDrag)
@@ -73,80 +61,69 @@ function orbit(obj)
     }
 }
 
-function isInteger(value)
-{
+function isInteger(value) {
     return (value | 0) === value;
 }
 
 // ::: Point: a 3-dimensional point
 // 3d point manipulation,in Javascript
-var Point = function(x,y,z)
-{
+var Point = function(x,y,z) {
     this.x = x;
     this.y = y;
     this.z = z;
 }
 
-Point.prototype.add = function(p)
-{
+Point.prototype.add = function(p) {
     this.x += p.x;
     this.y += p.y;
     this.z += p.z;
     return this;
 }
 
-Point.prototype.sub = function(p)
-{
+Point.prototype.sub = function(p) {
     this.x -= p.x;
     this.y -= p.y;
     this.z -= p.z;
     return this;
 }
 
-Point.prototype.scale = function(c)
-{
+Point.prototype.scale = function(c) {
     this.x *= c;
     this.y *= c;
     this.z *= c;
     return this;
 }
 
-Point.prototype.zero = function()
-{
+Point.prototype.zero = function() {
     this.x = 0.0;
     this.y = 0.0;
     this.z = 0.0;
     return this;
 }
 
-Point.prototype.set = function(x, y, z)
-{
+Point.prototype.set = function(x, y, z) {
     this.x = x;
     this.y = y;
     this.z = z;
 }
 
-Point.prototype.dot = function(p)
-{
+Point.prototype.dot = function(p) {
     return this.x*p.x + this.y*p.y + this.z*p.z;
 }
 
-Point.prototype.copy = function(p)
-{
+Point.prototype.copy = function(p) {
     this.x = p.x;
     this.y = p.y;
     this.z = p.z;
 }
 
-Point.prototype.addCP = function(c, p)
-{
+Point.prototype.addCP = function(c, p) {
     this.x += c * p.x;
     this.y += c * p.y;
     this.z += c * p.z;
 }
 
-Point.prototype.toString = function()
-{
+Point.prototype.toString = function() {
     return "{" + this.x + "," + this.y + "," + this.z + "}";
 }
 
@@ -156,8 +133,8 @@ Point.prototype.toString = function()
 var Eye = function(
     distance, // double: distance to back off from center
     spin, // Point: rotate about x, rotate about y rotate about z
-    zoom) // double: 
-{
+    zoom // double: 
+) {
     if (Number(distance) !== distance) alert("distance should be a number");
     if (Number(zoom) !== zoom) alert("zoom should be a number");
     this.distance = distance; // double, step straight back distance "dist", applied after spin
@@ -178,25 +155,23 @@ var Eye = function(
     this.rotateZ(spin.z);  // rotate clockwise
 }
 
-Eye.prototype.setCenter = function(p) // a point
-{
+
+Eye.prototype.setCenter = function(p) { // a point
     this.before.copy(p);
 }
 
-Eye.prototype.shiftPixels = function(right, down)
-{
+Eye.prototype.shiftPixels = function(right, down) {
     this.after.x += right * this.after.z;
     this.after.y += down * this.after.z;
 }
 
-Eye.prototype.adjustZoom = function(ratio)
-{
+Eye.prototype.adjustZoom = function(ratio) {
     this.zoom *= ratio;
 }
 
 // apply a rotation r: m = r times m-transpose
-Eye.prototype.rotate = function(r) // r is a Number[3][3]
-{
+Eye.prototype.rotate = function(r // r is a Number[3][3]
+) {
     var m = this.m;
     var x = new Point(m[0].x * r[0][0] + m[1].x * r[0][1] + m[2].x * r[0][2],
                       m[0].y * r[0][0] + m[1].y * r[0][1] + m[2].y * r[0][2],
@@ -213,8 +188,7 @@ Eye.prototype.rotate = function(r) // r is a Number[3][3]
 }
 
 // rotate down (around x axis)
-Eye.prototype.rotateX = function(x)
-{
+Eye.prototype.rotateX = function(x) {
     var sinx = Math.sin(x);
     var cosx = Math.cos(x);
     var d = [[1.0,0.0,0.0],[0.0,cosx,sinx],[0.0,-sinx,cosx]];
@@ -222,8 +196,7 @@ Eye.prototype.rotateX = function(x)
 }
 
 // rotate right (around y axis)
-Eye.prototype.rotateY = function(y)
-{
+Eye.prototype.rotateY = function(y) {
     var siny = Math.sin(y);
     var cosy = Math.cos(y);
     var r = [[cosy,0.0,siny],[0.0,1.0,0.0],[-siny,0.0,cosy]];
@@ -231,8 +204,7 @@ Eye.prototype.rotateY = function(y)
 }
 
 // rotate clockwise (around z axis)
-Eye.prototype.rotateZ = function(z)
-{
+Eye.prototype.rotateZ = function(z) {
     var sinz = Math.sin(z);
     var cosz = Math.cos(z);
     var r = [[cosz,sinz,0.0],[-sinz,cosz,0.0],[0.0,0.0,1.0]];
@@ -240,8 +212,7 @@ Eye.prototype.rotateZ = function(z)
 }
 
 // show point from the eye's coordinates
-Eye.prototype.map = function(p)
-{
+Eye.prototype.map = function(p) {
     var a = new Point(p.x,p.y,p.z);
     a.sub(this.before);
     var b = new Point(a.dot(this.m[0]),a.dot(this.m[1]),a.dot(this.m[2]))
@@ -250,30 +221,26 @@ Eye.prototype.map = function(p)
 }
 
 // map a point (after mapping to eye's coordinates) to the x-axis of the display
-Eye.prototype.mapX = function(p)
-{
+Eye.prototype.mapX = function(p) {
     return this.centerX + Math.round(this.zoom * p.x/p.z);
 }
 
 // map a point (after mapping to eye's coordinates) to the y-axis of the display
-Eye.prototype.mapY = function(p)
-{
+Eye.prototype.mapY = function(p) {
     return this.centerY + Math.round(this.zoom * p.y/p.z);
 }
 
-Eye.prototype.mapRadius = function(r, p)
-{
+Eye.prototype.mapRadius = function(r, p) {
     return p.z > 0.0 ? this.zoom * r / p.z : 0.0;
 }
 
-Eye.prototype.setDimensions = function(x, y)
-{
+Eye.prototype.setDimensions = function(x, y) {
     this.maxX = x;
-    this.centerX = x/2;
+    this.centerX = x >> 1;
     this.maxY = y;
-    this.centerY = y/2;
+    this.centerY = y >> 1;
 
-    // for 3d spins, assume the user is looking at things the size of a sphere that fits on the screen
+    // for 3d spins, assume user is looking at things the size of a sphere that fits on the screen
     this.rotateScale = 1.0 / (x > y ? y : x);
 }
 
@@ -286,8 +253,8 @@ var Moon = function(
     v,  // a point, the velocity
     mass,  // double
     color,  // string, like "#000000" or "black"
-    radius)  // double
-{
+    radius  // double
+) {
     this.name = name;
 
     if (!(p instanceof Point)) alert("p should be of type Point in moon " + name);
@@ -316,23 +283,21 @@ var Moon = function(
 }
 
 
-Moon.prototype.setPoints = function(points)
-{
+Moon.prototype.setPoints = function(points) {
     this.points = points;
-    var history = 2*points + 2;
+    var history = 2*points+1;
     this.history = history;
     
     // oa and ov are circular buffers with history distinct points.
     // Rather than having oa of length points and doing oa[head+x % points], I make oa twice as
-    // long as I need to, make sure points-1 <= head < 2*points-1, and refer to plain oa[head-x].
+    // long as I need to, make sure history <= head < 2*history, and refer to plain oa[head-x].
     // I could have arranged to do oa[head+x], but oa means "old accelerations", I'm looking at the
     // past, so subtraction seems more natural.
     // That also means head gets incremented with each step, which again seems natural.
-    // It's 2*history rather than history because cosmos.prepare() needs history distinct points.
+    // history=2*points+1 rather than points because cosmos.prepare() needs 2*points+1 points.
     this.oa = new Array(2*history);
     this.ov = new Array(2*history);
-    for (var i = 0;  i < 2*points+2;  i++)
-    {
+    for (var i = 0;  i < history;  i++) {
         this.oa[i] = new Point(0.0, 0.0, 0.0);
         this.oa[i + history] = this.oa[i];
         this.ov[i] = new Point(0.0, 0.0, 0.0);
@@ -343,8 +308,8 @@ Moon.prototype.setPoints = function(points)
 
 
 // attract this moon to the other, and the other moon to this one
-Moon.prototype.attract = function(other) // other moon
-{
+Moon.prototype.attract = function(other // other moon
+) {
     var diff = new Point(this.p.x, this.p.y, this.p.z);
     diff.sub(other.p);
     var scale = diff.dot(diff);
@@ -354,12 +319,13 @@ Moon.prototype.attract = function(other) // other moon
     other.a.addCP(this.mass * scale, diff);
 }
 
-Moon.prototype.recordStep = function()
-{
+Moon.prototype.recordStep = function() {
     this.steps++;
-    this.head++;
-    if (this.head == 2*this.history)
-        this.head -= this.history;
+    if (this.head == 2*this.history - 1) {
+        this.head = this.head + 1 - this.history;
+    } else {        
+        this.head++;
+    }
     this.ov[this.head].copy(this.v);
     this.oa[this.head].copy(this.a);
 }
@@ -369,8 +335,7 @@ Moon.prototype.recordStep = function()
 
 // ::: Cosmos: a whole n-body simulation, with many moons
 // Initialize it with the object passed in from the webpage
-var Cosmos = function(obj, canvas)
-{
+var Cosmos = function(obj, canvas) {
     this.canvas = canvas;
     canvas.oldMouseX = 0;
     canvas.oldMouseY = 0;
@@ -390,8 +355,7 @@ var Cosmos = function(obj, canvas)
 
     // make a deep copy of the obj moons, in case we want to restart from the original later
     this.moons = [];
-    for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-    {
+    for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
         var moon = obj.moons[iMoon];
         this.moons.push(new Moon(
             moon.name,
@@ -404,10 +368,8 @@ var Cosmos = function(obj, canvas)
     this.displayMoons = this.moons.slice();
     
     // Sort moons by weight
-    for (var i = 1;  i < nMoons;  i++)
-    {
-        for (var j = i+1;  --j>0 && this.moons[j].mass < this.moons[j-1].mass; )
-        {
+    for (var i = 1;  i < nMoons;  i++) {
+        for (var j = i+1;  --j>0 && this.moons[j].mass < this.moons[j-1].mass; ) {
             var temp = this.moons[j];
             this.moons[j] = this.moons[j-1];
             this.moons[j-1] = temp;
@@ -432,8 +394,7 @@ var Cosmos = function(obj, canvas)
     if (this.framerate < 0) alert("framerate needs to be positive, not " + this.scalemass);
 
     // adjust mass and velocity so that the time increment is 1
-    for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-    {
+    for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
         var moon = this.moons[iMoon];
         moon.mass *= this.scalemass * this.inc * this.inc;
         moon.v.scale(this.inc);
@@ -455,14 +416,11 @@ var Cosmos = function(obj, canvas)
     this.displayCount = 0;
 
     // perspective
-    if ("eye" in obj)
-    {
+    if ("eye" in obj) {
         // make a deep copy of the eye
         var eye = obj.eye;
         this.eye = new Eye(eye.distance, new Point(eye.spin.x, eye.spin.y, eye.spin.z), eye.zoom);
-    }
-    else
-    {
+    } else {
         this.eye = new Eye(100.0, new Point(0.0, 0.0, 0.0), 100.0);
     }
     if (!(this.eye instanceof Eye)) alert("eye needs to be of type Eye");
@@ -485,29 +443,25 @@ var Cosmos = function(obj, canvas)
     this.autocenter = ("autocenter" in obj) ? obj.autocenter : true; // if true, use center of mass as center
     if (typeof this.autocenter !== "boolean") alert("autocenter should be a boolean, not " + this.autocenter);
 
-    if (this.autocenter)
-    {
+    if (this.autocenter) {
         var p = new Point(0.0, 0.0, 0.0);
         var v = new Point(0.0, 0.0, 0.0);
         var mass = 0.0;
 
         // find the weighted average position and velocity
-        for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-        {
+        for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
             var moon = this.moons[iMoon];
             mass += moon.mass;
             p.addCP(moon.mass, moon.p);
             v.addCP(moon.mass, moon.v);
         }
 
-        if (mass > 0)
-        {
+        if (mass > 0) {
             p.scale(1.0/mass);
             v.scale(1.0/mass);
 
             // adjust all the moons so the weighted average position and velocity are both zero
-            for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-            {
+            for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
                 var moon = this.moons[iMoon];
                 mass += moon.mass;
                 moon.p.sub(p);
@@ -520,10 +474,8 @@ var Cosmos = function(obj, canvas)
     this.lifetime = ("lifetime" in obj) ? obj.lifetime : 0.0;
     if (Number(this.lifetime) !== this.lifetime) alert("lifetime needs to be a number, not " + this.lifetime);
 
-    if ("follow" in obj)
-    {
-        for (var i = 0;  i < nMoons;  i++)
-        {
+    if ("follow" in obj) {
+        for (var i = 0;  i < nMoons;  i++) {
             if (this.moons[i].name == obj.follow)
                 this.follow = this.moons[i];
         }
@@ -551,16 +503,14 @@ var Cosmos = function(obj, canvas)
 // time reversible methods, and they dampen the jitter.  Alternating between step() and smooth() causes
 // random changes in direction though, and is not advised.
 
-Cosmos.prototype.step1 = function(moon)
-{
+Cosmos.prototype.step1 = function(moon) {
     var head = moon.head;
     moon.v.copy(moon.ov[head]);
     moon.v.add(moon.oa[head]);
     moon.p.add(moon.v);
 }
 
-Cosmos.prototype.step2 = function(moon)
-{
+Cosmos.prototype.step2 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -572,8 +522,7 @@ Cosmos.prototype.step2 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth2 = function(moon)
-{
+Cosmos.prototype.smooth2 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var ov = moon.ov;
@@ -589,8 +538,7 @@ Cosmos.prototype.smooth2 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step3 = function(moon)
-{
+Cosmos.prototype.step3 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -604,8 +552,7 @@ Cosmos.prototype.step3 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth3 = function(moon)
-{
+Cosmos.prototype.smooth3 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -627,8 +574,7 @@ Cosmos.prototype.smooth3 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step4 = function(moon)
-{
+Cosmos.prototype.step4 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -647,8 +593,7 @@ Cosmos.prototype.step4 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth4 = function(moon)
-{
+Cosmos.prototype.smooth4 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -676,8 +621,7 @@ Cosmos.prototype.smooth4 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step5 = function(moon)
-{
+Cosmos.prototype.step5 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -697,8 +641,7 @@ Cosmos.prototype.step5 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth5 = function(moon)
-{
+Cosmos.prototype.smooth5 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -730,8 +673,7 @@ Cosmos.prototype.smooth5 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step6 = function(moon)
-{
+Cosmos.prototype.step6 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -753,8 +695,7 @@ Cosmos.prototype.step6 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth6 = function(moon)
-{
+Cosmos.prototype.smooth6 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -789,8 +730,7 @@ Cosmos.prototype.smooth6 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step7 = function(moon)
-{
+Cosmos.prototype.step7 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -813,8 +753,7 @@ Cosmos.prototype.step7 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth7 = function(moon)
-{
+Cosmos.prototype.smooth7 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -853,8 +792,7 @@ Cosmos.prototype.smooth7 = function(moon)
 }
 
 
-Cosmos.prototype.step8 = function(moon)
-{
+Cosmos.prototype.step8 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -879,8 +817,7 @@ Cosmos.prototype.step8 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth8 = function(moon)
-{
+Cosmos.prototype.smooth8 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -921,8 +858,7 @@ Cosmos.prototype.smooth8 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step9 = function(moon)
-{
+Cosmos.prototype.step9 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -948,8 +884,7 @@ Cosmos.prototype.step9 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth9 = function(moon)
-{
+Cosmos.prototype.smooth9 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -993,8 +928,7 @@ Cosmos.prototype.smooth9 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step10 = function(moon)
-{
+Cosmos.prototype.step10 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1022,8 +956,7 @@ Cosmos.prototype.step10 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth10 = function(moon)
-{
+Cosmos.prototype.smooth10 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1070,8 +1003,7 @@ Cosmos.prototype.smooth10 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step11 = function(moon)
-{
+Cosmos.prototype.step11 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1100,8 +1032,7 @@ Cosmos.prototype.step11 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth11 = function(moon)
-{
+Cosmos.prototype.smooth11 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1151,8 +1082,7 @@ Cosmos.prototype.smooth11 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step12 = function(moon)
-{
+Cosmos.prototype.step12 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1183,8 +1113,7 @@ Cosmos.prototype.step12 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth12 = function(moon)
-{
+Cosmos.prototype.smooth12 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1237,8 +1166,7 @@ Cosmos.prototype.smooth12 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step13 = function(moon)
-{
+Cosmos.prototype.step13 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1270,8 +1198,7 @@ Cosmos.prototype.step13 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth13 = function(moon)
-{
+Cosmos.prototype.smooth13 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1327,8 +1254,7 @@ Cosmos.prototype.smooth13 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step14 = function(moon)
-{
+Cosmos.prototype.step14 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1362,8 +1288,7 @@ Cosmos.prototype.step14 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth14 = function(moon)
-{
+Cosmos.prototype.smooth14 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1422,8 +1347,7 @@ Cosmos.prototype.smooth14 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.step15 = function(moon)
-{
+Cosmos.prototype.step15 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1458,8 +1382,7 @@ Cosmos.prototype.step15 = function(moon)
     moon.p.add(v);
 }
 
-Cosmos.prototype.smooth15 = function(moon)
-{
+Cosmos.prototype.smooth15 = function(moon) {
     var v = moon.v;
     var oa = moon.oa;
     var head = moon.head;
@@ -1558,8 +1481,7 @@ Cosmos.prototype.smooth = [
     Cosmos.prototype.smooth15];
 
 
-Cosmos.prototype.measureAccelerations = function()
-{
+Cosmos.prototype.measureAccelerations = function() {
     var nMoons = this.moons.length;
     var firstMass = this.firstMass;
 
@@ -1568,16 +1490,14 @@ Cosmos.prototype.measureAccelerations = function()
         this.moons[iMoon].a.zero();
 
     // moons without mass only interact with moons with mass
-    for (var iMoon = 0;  iMoon < firstMass;  iMoon++)
-    {
+    for (var iMoon = 0;  iMoon < firstMass;  iMoon++) {
         var moon = this.moons[iMoon];
         for (var iOther = firstMass; iOther < nMoons;  iOther++)
             moon.attract(this.moons[iOther]);
     }
 
     // moons with mass interact with each other, equally
-    for (var iMoon = firstMass;  iMoon < nMoons;  iMoon++)
-    {
+    for (var iMoon = firstMass;  iMoon < nMoons;  iMoon++) {
         var moon = this.moons[iMoon];
         for (var iOther = iMoon+1;  iOther < nMoons;  iOther++)
             moon.attract(this.moons[iOther]);
@@ -1585,27 +1505,23 @@ Cosmos.prototype.measureAccelerations = function()
 }
 
 
-Cosmos.prototype.recordStep = function()
-{
+Cosmos.prototype.recordStep = function() {
     var nMoons = this.moons.length;
     for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
         this.moons[iMoon].recordStep();
 }
 
 
-Cosmos.prototype.updateEye = function()
-{
+Cosmos.prototype.updateEye = function() {
     // Center on the moon we are following.
-    if (this.follow != null)
-    {
+    if (this.follow != null) {
         this.eye.setCenter(this.follow.p);
     }
 
     // Know the positions to display the moons.
     var nMoons = this.moons.length;
     var eye = this.eye;
-    for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-    {
+    for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
         var moon = this.moons[iMoon];
         moon.peye = eye.map(moon.p);
     }
@@ -1613,10 +1529,8 @@ Cosmos.prototype.updateEye = function()
     // Sort displayMoons by distance, so they overlap correctly.
     // Use bubblesort because the sort order doesn't change much from display to display.
     nMoons = this.displayMoons.length;
-    for (var i = 1;  i < nMoons;  i++)
-    {
-        for (var j = i+1;  --j>0 && this.displayMoons[j].peye.z > this.displayMoons[j-1].peye.z; )
-        {
+    for (var i = 1;  i < nMoons;  i++) {
+        for (var j = i+1;  --j>0 && this.displayMoons[j].peye.z > this.displayMoons[j-1].peye.z;) {
             var temp = this.displayMoons[j];
             this.displayMoons[j] = this.displayMoons[j-1];
             this.displayMoons[j-1] = temp;
@@ -1625,24 +1539,20 @@ Cosmos.prototype.updateEye = function()
 }
 
 
-Cosmos.prototype.multistep = function()
-{
+Cosmos.prototype.multistep = function() {
     var nMoons = this.moons.length;
     var points = this.points;
 
-    if (this.smooth)
-    {
+    if (this.smooth) {
         // Although each smooth function is good, and each step function is good,
         // trying to dejitter a step function by switching to a smooth function changes the velocity significantly.
-        for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-        {
+        for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
             this.smooth[points](this.moons[iMoon]);
         }
     }
     else
     {
-        for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-        {
+        for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
             this.step[points](this.moons[iMoon]);
         }
     }
@@ -1653,20 +1563,17 @@ Cosmos.prototype.multistep = function()
 
 
 // move the simulation time this.t forward by amount this.work
-Cosmos.prototype.move = function()
-{
+Cosmos.prototype.move = function() {
     if (this.lifetime > 0 && this.t > this.lifetime)
         return false;
 
-    for (var iTick = 0;  iTick < this.work;  iTick++)
-    {
+    for (var iTick = 0;  iTick < this.work;  iTick++) {
         this.t += this.inc;
         this.iter += 1;
         
-        if (this.lifetime <= 0 || this.t < this.lifetime)
+        if (this.lifetime <= 0 || this.t < this.lifetime) {
             this.multistep();
-        else
-        {
+        } else {
             this.canvas.restart = true;
             this.canvas.stopped = true;
         }
@@ -1675,37 +1582,28 @@ Cosmos.prototype.move = function()
 
 
 // prepare to run: generate the history that the multistep function needs
-// Suppose iter=0 and _points=1 (using leapfrog).  Let P, V, A be reverse direction and p, v, a be forward.
-// The goal is to start at the start, but have a history going back before the start:
-//    v_0 = v_given - (1/2)a_0 (v_0 for leapfrog is really p_0 - p_-1, thus the -(1/2)a_0)
-//    p_0 = p_-1 + v_0 = p_given
-// To do that, run leapfrog in reverse, starting with
-//    A_0 = a_0 = (derived from p_given)
-//    V_0 = -v_given - (1/2)a_0
-//    P_0 = p_0 = p_given
-// and run leapfrog once
-//    V_1 = V_0 + A_0 = (-v_given - (1/2)a_0) + a_0 = -v_given + (1/2)a_0
-//    P_1 = P_0 + V_0
-// then repair the positions so we go forward in time again
-//    a_0 = A_0
-//    v_0 = -V_1 = v_given - (1/2)a_0
-//    p_0 = p_given
-// If the multistep uses n steps not just 1,
-//    scale down the time to 2^^-Iters of its original size,
-//    still reverse everything,
-//    still use leapfrog but for n steps instead of 1, giving you n tiny steps in reverse
-//    Iters times: take n more steps, then double the timestep and take every other remembered step,
-//    now it is taking full timesteps but into the past,
-//    reverse everything and it's taking full timesteps forward and with an adequate past.
-Cosmos.prototype.prepare = function()
-{
-    var iters = 0;
+// Scale down to 2^-iter the original step size
+// Use Verlet to generate the first n points backwards, and multistep to generate 1 more:
+//   Verlet is inaccurate with high accelerations, but OK with very tiny step sizes
+// Double the length iter times to get back up to full speed:
+//   Generate n more points multistep (2n+1 total)
+//   Remember every other acceleration (n+1 total)
+//   Sum neighboring velocities to get the doubled velocity (but leave ov[head-n] garbage)
+//   correct the scale factors
+// This leaves you with n+1 points, where oa[head-n] is the original starting acceleration.
+// Reverse the n+1 accelerations.
+// Velocities are really p[i]-p[i-1], so negating and reversing would give p[i+1]-p[i],
+//   but you really want p[i]-p[i-1], just reversing would leave them off by one.
+// Negate and reverse only n velocities, this fixes the off-by-one and ignores ov[head-n].
+// oa[head], ov[head] are now the correct starting position and have adequate history.
+Cosmos.prototype.prepare = function() {
+    var iters = 30; // javascript cannot handle shifts of >= 31; 31 negates and 32 wraps around
     var big = (1 << iters) * 1.0;
+    var n = this.points; // number of points
 
     // scale down to 2^^-iters, and reverse direction
     var nMoons = this.moons.length;
-    for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-    {
+    for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
         var moon = this.moons[iMoon];
         moon.mass /= big*big;
         moon.v.scale(-1.0/big);
@@ -1714,10 +1612,10 @@ Cosmos.prototype.prepare = function()
     // measure the initial accelerations before we have taken any steps
     this.measureAccelerations();
 
-    // subtract accel/2 from velocity: leapfrog wants ov[head] to be between steps not exactly on steps
+    // subtract accel/2 from velocity and reverse the velocity so we walk backwards
+    // leapfrog wants p0-p1, not the actual v0
     var head = this.moons[0].head;
-    for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-    {
+    for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
         var moon = this.moons[iMoon];
         moon.oa[head].copy(moon.a);
         moon.ov[head].copy(moon.v);
@@ -1726,41 +1624,48 @@ Cosmos.prototype.prepare = function()
         moon.ov[head].add(dv);
     }
 
-    // take points steps backwards with the inaccurate leapfrog method, so this.points+1 points total now
-    var points = this.points;
-    for (var iStep = 0;  iStep < points;  iStep++)
-    {
-        for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-        {
+    // Add n-1 more points with inaccurate leapfrog method, n total
+    for (var iStep = 1;  iStep < n;  iStep++) {
+        for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
             this.step[1](this.moons[iMoon]);
         }
         this.measureAccelerations();
         this.recordStep();
     }
 
-    // Use the accurate multistep method to produce this.points more points, for 2*this.points+2 total points,
-    // then remember just every other point and double the timestep.
-    // Do this iters times to scale up to the correct time increment (but in the reverse direction).
-    for (var iIter = 0;  iIter < iters;  iIter++)
-    {
-        for (var iStep = 0;  iStep < points+1;  iStep++)
-            this.multistep();
+    // Add one more point, n+1 total, so start is at oa[head-n]
+    this.multistep();
 
+    // Do this iters times to scale up to the correct time increment (in the reverse direction).
+    for (var iIter = 0;  iIter < iters;  iIter++) {
+        // Use the accurate multistep method to produce n more points
+        // making 2n+1 total points, so start is at oa[head-2n]
+        for (var iStep = 0;  iStep < n;  iStep++) {
+            this.multistep();
+        }
+
+        // For every moon
         head = this.moons[0].head;
-        for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-        {
+        for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
             var moon = this.moons[iMoon];
-            for (var iHist = 0;  iHist < points+1;  iHist++)
-            {
+            // remember every other point and double the timestep.            
+            for (var iHist = 0;  iHist < n;  iHist++) {
                 var iNew = head - iHist;
-                var iOld = head - iHist - iHist;
+                var iOld = head - 2*iHist;
                 var newV = moon.ov[iNew];
                 newV.copy(moon.ov[iOld]);
-                newV.add(moon.ov[iOld - 1]);
+                newV.add(moon.ov[iOld - 1]); // this uses 1-2n when iHist=n-1
                 var newA = moon.oa[iNew];
                 newA.copy(moon.oa[iOld]);
                 newA.scale(4.0);
             }
+
+            // For start, copy acceleration, but leave ov[] garbage, it will not be used.
+            // It would be illegal to look at ov[head-2n-1] anyhow.
+            var newStart = moon.oa[head - n];
+            newStart.copy(moon.oa[head - 2*n]);
+            newStart.scale(4.0);
+
             moon.mass *= 4.0;
             moon.v.copy(moon.ov[head]);
             moon.a.copy(moon.oa[head]);
@@ -1768,36 +1673,41 @@ Cosmos.prototype.prepare = function()
     }
 
     // Now reverse time, leaving us at the original starting point
-    // and with this.points+1 of history, and the correct time increment
+    // and with n points of history, and the correct time increment
     head = this.moons[0].head;
-    for (var iMoon = 0;  iMoon < nMoons;  iMoon++)
-    {
+    for (var iMoon = 0;  iMoon < nMoons;  iMoon++) {
         var moon = this.moons[iMoon];
 
-        // reverse old velocities, shifted by one
-        for (var iHist = 0;  iHist < points/2;  iHist++)
-        {
-            var va = moon.ov[head - iHist];
-            var vb = moon.ov[head - points + 1 + iHist];
-            var temp = new Point(va.x, va.y, va.z);
-            va.copy(vb);
-            vb.copy(temp);
-        }
-
-        // reverse old accelerations
-        for (var iHist = 0;  iHist < (points+1)/2;  iHist++)
-        {
+        // reverse old accelerations 0..-n to -n..0
+        for (var iHist = 0;  iHist < ((n+1) >> 1);  iHist++) { // if n+1=3, iHist=1 is skipped
             var aa = moon.oa[head - iHist];
-            var ab = moon.oa[head - points + iHist];
+            var ab = moon.oa[head + iHist - n]; // if n+1=3 and iHist=0, this is -2
             var temp = new Point(aa.x, aa.y, aa.z);
             aa.copy(ab);
             ab.copy(temp);
         }
 
-        // adjust the position, and reverse the velocities
-        for (var iHist = 0;  iHist < points;  iHist++)
-        {
+        // negate the velocities (ignore the garbage ov[head-n])
+        for (var iHist = 0;  iHist < n;  iHist++) {
             moon.ov[head - iHist].scale(-1.0);
+        }
+
+        // Velocities are off by one:
+        //   ov[0] was op[0]-op[-1] before we negated it,
+        //   but if we swapped 0..-3 to -3..0, the new ov[0] would become -(op[-3]-op[-4])
+        //   we actually want it be -(op[-2]-op[-3]) if the original position was in -3.
+        // So actually reverse velocities 0..-n+1 to -n+1..0 instead of 0..-n to -n..0
+        // That leaves n-1 in 0 for velocity but n in 0 for acceleration.
+        for (var iHist = 0;  iHist < (n >> 1);  iHist++) {
+            var va = moon.ov[head - iHist];
+            var vb = moon.ov[head + iHist + 1 - n];
+            var temp = new Point(va.x, va.y, va.z);
+            va.copy(vb);
+            vb.copy(temp);
+        }
+
+        // add all the velocities to get back the original p
+        for (var iHist = 0;  iHist < n;  iHist++) {
             moon.p.add(moon.ov[head-iHist]);
         }
         moon.v.copy(moon.ov[head]);
@@ -1913,3 +1823,4 @@ Cosmos.prototype.display = function()
         }
     }
 }
+

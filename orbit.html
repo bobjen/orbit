@@ -8,7 +8,6 @@
 <body bgcolor="#000000"
 text="#ffffff" link="#ffff00" vlink="#00ffff" alink="#0fffff">
 
-
 <center><h2>Javascript Canvas for Gravitational Orbit Simulation</h2></center>
 
 <p><center>Click to start, stop, rotate or zoom<br>
@@ -35,7 +34,7 @@ text="#ffffff" link="#ffff00" vlink="#00ffff" alink="#0fffff">
   </canvas>
 </center>
 
-<p><hr size="1">
+<p><hr size=1>
 <p>The canvas above is a gravitational simulator of orbits in space.
 The code is in
 <a href="orbit.js">orbit.js</a>.  The mouse lets it stop and start
@@ -111,7 +110,7 @@ center is the center of gravity.
     
 </dl>
 
-<hr line="1">
+<hr line=1>
 
 <p>Here's an overview of the orbital code.
 
@@ -140,7 +139,7 @@ Moon.velocity() for estimating the velocity from positions when we
 need it.
 </ul>
 
-<p>Moons of weight 0 have an optimization that they're ignored when
+<P>Moons of weight 0 have an optimization that they're ignored when
 calculating the forces on all other objects.  That means 1 sun with
 1000 massless satellites takes O(n) to simulate instead of
 O(n<sup>2</sup>).  It allows massless objects around binary stars or
@@ -164,6 +163,6 @@ velocity.  Although Simulate.FindEnergy() could use the distances
 between moons calculated in Simulate.accel(), accel() is called much
 more often, so it turned out to be faster to have accel() simple and
 FindEnergy() as a separate routine.
-  
+
 </body>
 </html>
