@@ -79,4 +79,7 @@ new Moon(name, position, velocity, mass, color, radius)
 ## Building
 
 No build step — `orbit.js` is a single self-contained script.  Open
-`orbit.html` in a browser to see the included demo.
+`orbit.html` in a browser to see the included demo. A webpage can run
+multiple simulations. The full definition of each simulation is
+self-contained in its canvas, so tweaks can be done by cut-n-pasting
+canvases.
