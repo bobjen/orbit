@@ -1,6 +1,6 @@
 # orbit
 
-JavaScript gravitational orbit simulator, rendered on an HTML5 canvas.
+JavaScript n-body gravitational orbit simulator, rendered on an HTML5 canvas.
 
 Original implementation by Bob Jenkins (2019, public domain).
 
