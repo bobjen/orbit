@@ -10,8 +10,8 @@ Documentation and live demos: https://burtleburtle.net/bob/js/orbit.html
 
 Newton's law gives accelerations from positions and masses.  Positions are
 advanced using an explicit symmetric multistep method (1–15 prior
-accelerations, default 8), which is time-reversible and more accurate than
-simple Euler or Runge-Kutta for long simulations.  Several integration steps
+accelerations, default 8), which is time-reversible and far more accurate than
+simple Verlet or Runge-Kutta.  Several integration steps
 are taken per displayed frame.
 
 Massless bodies (mass 0) are skipped when computing forces on other bodies, so
